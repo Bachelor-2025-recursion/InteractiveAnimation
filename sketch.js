@@ -1,13 +1,21 @@
 function setup() {
-  createCanvas(100, 100);
-
+  createCanvas(windowWidth, windowHeight);
   background(200);
+  textFont('Courier New')
 
-  circle(50, 50, 25);
+  let callValue = 3
+  let recursionStack = []
 
-  describe('A white circle with black outline in the middle of a gray canvas.');
-}
+  for (let i = 0; i < callValue; i++) {
+    let offsetX = i * 20
+    let offsetY = i * 20
 
-function draw() {
-  // put drawing code here
+    push(); 
+    translate(offsetX, offsetY) // Move to the new position
+    let SumRecBox = new SumCodeBox(callValue - i)
+    recursionStack[i] = SumRecBox
+    //SumRecBox.draw()
+    recursionStack[i].draw()
+    pop(); // Restore the original drawing state
+  }
 }
