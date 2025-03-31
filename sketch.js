@@ -1,88 +1,80 @@
-let frameState = 0
-
-const frames = [ 
-  function () { drawEntry() },
-  function () { 
-    drawEntry()
-    drawInstance(1) 
-  },
-  function () { 
-    drawEntry()
-    drawInstance(1) 
-    drawInstance(2) 
-  },
-  function () { 
-    drawEntry()
-    drawInstance(1) 
-    drawInstance(2)
-    drawInstance(3) 
-  },
-  function () { 
-    drawEntry()
-    drawInstance(1) 
-    drawInstance(2)
-    drawInstance(3)
-    drawInstance(4) 
+class Entity {
+  constructor(startX, startY, parent = null, animation = null) {
+    this.x = parent != null ? parent.x + startX : startX;
+    this.y = parent != null ? parent.y + startY : startY;
+    this.parent = parent != null ? parent : null;
+    this.animation = animation;
   }
-];
 
-function IncreaseFrameState() {
-  if (frameState < frames.length - 1) {
-    frameState++;
+  render() {
+    fill(255, 0, 0);
+    circle(this.x, this.y, 20);
+  }
+
+  animate() {
+    if (this.animation != null) {
+      this.animation();
+    } else {
+      console.log("No animation");
+    }
   }
 }
 
-function DecreaseFrameState() {
-  if (frameState > 0) {
-    frameState--;
+class CodeBlock extends Entity {
+  constructor(startX, startY, parent = null, animation = null, code) {
+    super(startX, startY, parent, animation);
+    this.code = code;
+  }
+
+  render() {
+    let lines = this.code.trim().split("\n");
+    let lineHeight = textAscent() + textDescent() + 5;
+
+    let codeWidth = textWidth(this.code) + 20;
+    let codeHeight = lines.length * lineHeight;
+    fill(150, 200, 250);
+    rect(this.x, this.y, codeWidth, codeHeight, 10);
+    fill(0);
+    text(this.code, this.x + 10, this.y + 10);
   }
 }
 
-function drawEntry() {
-  rect(50, 20, 400, 50, 10);
-  text('System.out.println(sum(3));', 70, 56)
-}
-
-function drawInstance(n) {
-  rect((1 + n) * 80, (n - 1) * 200 + 90, 400, 180, 10);
-}
-
-function drawExplanation() {
-  text('Lorem ipsum dolar sit amet', windowWidth/2, 50)
-}
+let testEntity, testEntity2, codeBlockTest;
 
 function setup() {
-  createCanvas(windowWidth, windowHeight-50);
+  createCanvas(windowWidth, windowHeight - 50);
   // Matches the background color sat in index.html
   background(208);
-  textSize(18);
-  describe('A white circle with black outline in the middle of a gray canvas.');
-
-  let rightButton = createButton('Next');
-  rightButton.position(windowWidth/2 + 10, windowHeight-50);
-  rightButton.style('width', '70px');
-  rightButton.style('height', '40px');
-  rightButton.style('color', 'white');
-  rightButton.style('background-color', 'blue');
-  rightButton.mousePressed(IncreaseFrameState);
-
-  let leftButton = createButton('Previous');
-  leftButton.position(windowWidth/2 - 70, windowHeight-50);
-  leftButton.style('width', '70px');
-  leftButton.style('height', '40px');
-  leftButton.style('color', 'white');
-  leftButton.style('background-color', 'blue');
-  leftButton.mousePressed(DecreaseFrameState);
-
-  drawEntry();
-  drawExplanation();
+  testEntity = new Entity(100, 150);
+  testEntity2 = new Entity(20, 0, testEntity, function () {
+    this.x++;
+  });
+  codeBlockTest = new CodeBlock(
+    100,
+    100,
+    testEntity,
+    function(){
+      if (this.x < 500){this.x++}
+    },
+    `
+public static int sum(int n) {
+    if (n <= 0) {
+        return 0; // Base case
+    }
+    return n + sum(n - 1); // Recursive case
+}
+`
+  );
 }
 
 function draw() {
-  // put drawing code here
-  resizeCanvas(windowWidth, windowHeight-40);
-  // Matches the background color sat in index.html
   background(208);
-
-  frames[frameState]();
+  // put drawing code here
+  // Matches the background color sat in index.html
+  // testEntity.render();
+  // testEntity2.render();
+  // testEntity2.animate();
+  codeBlockTest.render();
+  // codeBlockTest.animate();
+  
 }
